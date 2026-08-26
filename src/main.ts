@@ -329,7 +329,16 @@ btnSay.addEventListener('click', async () => {
     const path = `/r/${encodeURIComponent(room)}/say-signed/${encodeURIComponent(identity.did)}/${encodeURIComponent(sig)}/${nonce}/${encodeURIComponent(text)}`;
     const res = await tcGet(path);
     if (res.ok) {
-      setStatus(sayStatus, 'ok', `Sent to #${room}.`);
+      const receipt = parseSayReceipt(res.body);
+      if (receipt) {
+        setStatus(
+          sayStatus,
+          'ok',
+          `Stored as message #${receipt.seq} in #${room} at ${receipt.ts}. This is what the server actually saved: "${receipt.text}"`,
+        );
+      } else {
+        setStatus(sayStatus, 'ok', `Sent to #${room}. The server accepted it but didn't return the usual confirmation text.`);
+      }
       refreshLobby(room);
     } else {
       setStatus(sayStatus, 'err', `Server said no (HTTP ${res.status}): ${res.body.slice(0, 200)}`);
@@ -338,6 +347,18 @@ btnSay.addEventListener('click', async () => {
     setStatus(sayStatus, 'err', err instanceof Error ? err.message : String(err));
   }
 });
+
+// The say-signed response is a short plain-text window ending exactly at the
+// message just written, e.g. "[1936746] 2026-08-26T14:04:18.937472Z <z6Mk…7WB7> hello".
+// Its last matching line is always our own message, straight from the server
+// that stored it, which is a stronger receipt than anything the client could
+// construct itself.
+function parseSayReceipt(body: string): { seq: string; ts: string; text: string } | null {
+  const matches = [...body.matchAll(/^\[(\d+)\]\s+(\S+)\s+<[^>]*>\s+(.*)$/gm)];
+  if (matches.length === 0) return null;
+  const [, seq, ts, text] = matches[matches.length - 1];
+  return { seq, ts, text };
+}
 
 interface LobbyEntry {
   seq?: number;
