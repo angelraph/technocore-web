@@ -322,10 +322,10 @@ btnSay.addEventListener('click', async () => {
 });
 
 interface LobbyEntry {
-  did?: string;
-  writer?: string;
+  seq?: number;
+  ts?: string;
+  from?: string;
   text?: string;
-  ts?: number;
   [key: string]: unknown;
 }
 
@@ -340,7 +340,7 @@ async function refreshLobby(room = 'lobby') {
     let entries: LobbyEntry[] = [];
     try {
       const parsed = JSON.parse(res.body);
-      entries = Array.isArray(parsed) ? parsed : parsed.messages ?? parsed.entries ?? [];
+      entries = Array.isArray(parsed) ? parsed : parsed.messages ?? [];
     } catch {
       lobbyList.innerHTML = `<div class="lobby-entry">${res.body.slice(0, 2000)}</div>`;
       return;
@@ -353,10 +353,11 @@ async function refreshLobby(room = 'lobby') {
       .slice()
       .reverse()
       .map((e) => {
-        const who = String(e.did ?? e.writer ?? 'unknown');
+        const who = String(e.from ?? 'unsigned');
         const mine = identity && who === identity.did;
         const text = String(e.text ?? '');
-        return `<div class="lobby-entry${mine ? ' mine' : ''}"><div class="who">${escapeHtml(who)}</div>${escapeHtml(text)}</div>`;
+        const when = e.ts ? new Date(e.ts).toLocaleString() : '';
+        return `<div class="lobby-entry${mine ? ' mine' : ''}"><div class="who">${escapeHtml(who)}${when ? ' · ' + escapeHtml(when) : ''}</div>${escapeHtml(text)}</div>`;
       })
       .join('');
   } catch (err) {
