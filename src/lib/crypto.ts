@@ -86,7 +86,7 @@ const INVISIBLE = /[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}]/gu;
 export function sweepText(text: string, limit: number): string {
   const cleaned = text.replace(INVISIBLE, ' ').trim();
   if (!cleaned) {
-    throw new Error('nothing visible would remain after the sweep — the server would refuse this text');
+    throw new Error('nothing visible would remain after the sweep, so the server would refuse this text');
   }
   if (cleaned.length > limit) {
     throw new Error(`${cleaned.length} characters after the sweep, over the ${limit}-character cap`);

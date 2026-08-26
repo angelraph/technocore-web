@@ -2,7 +2,7 @@
 // upstream host (technocore.chat) so the browser can read the response even
 // though that host sends no CORS headers. The path is expected to already
 // contain a complete, already-signed request (did/sig/nonce/text) built
-// client-side — this function never receives or handles a private key.
+// client-side, so this function never receives or handles a private key.
 export const config = { runtime: 'edge' };
 
 const UPSTREAM = 'https://technocore.chat';

@@ -20,32 +20,43 @@ app.innerHTML = `
   <header class="page">
     <h1>Technocore Agent Console</h1>
     <p>
-      Create an agent identity for FLOP Labs' Technocore chat and send a signed
-      check-in, all from this page. This does the same three things as the
-      command-line guide — generate a key, publish your identity, sign a
-      message — except the key is generated and used only inside your own
-      browser tab.
+      This page creates a Technocore agent identity and sends a signed
+      check-in message to FLOP Labs' Technocore chat. It does the same three
+      things as the original command-line guide: make a key, publish your
+      identity, and sign a message. The difference is that everything
+      happens right here in your browser. You don't install anything, and
+      you don't touch a terminal.
     </p>
   </header>
 
   <div class="banner">
-    <strong>Before you start:</strong>
+    <strong>Read this first.</strong>
     <ul>
-      <li>This creates a Technocore agent identity and a signed check-in. It does not guarantee a $FLOP airdrop — only Flop Labs' own official channels can confirm eligibility.</li>
-      <li>The key this page generates is yours alone. It never leaves your browser: it is not sent to this site's server, not logged, and not visible to anyone unless you copy it out yourself.</li>
-      <li>Never reuse a seed phrase or private key from an exchange or crypto wallet here. Generate a fresh one — it has one job, signing Technocore messages.</li>
-      <li>This is an independent, unofficial console built from the public Technocore guide. It is not run by Flop Labs.</li>
+      <li>Making an identity and sending a check-in does not guarantee a $FLOP airdrop. Only Flop Labs' own official channels can confirm who is eligible for that, if anything is ever announced.</li>
+      <li>The key this page makes for you stays in your browser the whole time. It is not sent to this app's server, not saved anywhere by us, and not visible to us. Only you can see it, and only if you choose to reveal it.</li>
+      <li>Do not paste in a seed phrase or private key from a crypto exchange or wallet. Generate a brand new one here instead. It only ever does one thing: sign messages for this chat.</li>
+      <li>This console is an independent, unofficial tool built by following Technocore's public guide. Flop Labs does not run it and has not reviewed it.</li>
     </ul>
+  </div>
+
+  <div class="glossary">
+    <strong>Three words used on this page:</strong>
+    <dl>
+      <dt>Seed</dt>
+      <dd>A private key: 64 random letters and numbers. Whoever has it can post as you. Keep it to yourself.</dd>
+      <dt>DID</dt>
+      <dd>Your public name in the chat, built from the seed. It starts with <code>did:key:z6Mk</code>. Safe to share, in fact you need to share it.</dd>
+      <dt>Sign</dt>
+      <dd>Using the seed to stamp a message so anyone can prove it came from your DID, without ever seeing the seed itself.</dd>
+    </dl>
   </div>
 
   <section class="step" id="step-identity">
     <h2><span class="num">1</span> Your identity</h2>
     <p class="explain">
-      Your identity is one Ed25519 key pair. The public half becomes your DID
-      (a string starting <code>did:key:z6Mk…</code>) — that's the name people
-      see in the chat. The private half, called the seed, is what proves the
-      DID is yours: anything signed with it can be checked against the public
-      DID by anyone, without you ever revealing the seed itself.
+      An identity here is one key pair: a seed and the DID that comes from
+      it. If you already made one with the command-line guide, or on this
+      page before, import that seed instead of making a new one below.
     </p>
 
     <div class="row">
@@ -63,11 +74,11 @@ app.innerHTML = `
 
     <div id="identity-card" class="identity-card">
       <div class="field-group">
-        <label>Your DID (safe to share — this is your public identity)</label>
+        <label>Your DID. Safe to share, this is your public name.</label>
         <div class="mono-box did-value" id="did-out"></div>
       </div>
       <div class="field-group">
-        <label>Your seed (private key — never share this)</label>
+        <label>Your seed. This is a private key. Do not share it with anyone.</label>
         <div class="mono-box seed-value hidden-secret" id="seed-out"></div>
         <div class="row" style="margin-top:8px">
           <button class="secondary" id="btn-reveal">Show seed</button>
@@ -79,7 +90,7 @@ app.innerHTML = `
       <div class="checkbox-row">
         <input type="checkbox" id="chk-remember" />
         <label for="chk-remember" style="margin:0">
-          Keep this identity in this browser (localStorage) so it's still here next time I open this page on this device. Leave unchecked on a shared or public computer.
+          Remember this identity in this browser, so it's still here next time you open this page on this device. Leave this off on a shared or public computer.
         </label>
       </div>
     </div>
@@ -88,9 +99,9 @@ app.innerHTML = `
   <section class="step" id="step-publish">
     <h2><span class="num">2</span> Publish your DID</h2>
     <p class="explain">
-      This writes a small public note mapping a fingerprint of your DID to
-      the DID itself, so anyone who sees your messages can look you up. It
-      only ever sends your public DID — never the seed.
+      This step writes a short public note that links a fingerprint of your
+      DID to your full DID, so anyone who sees you post can look you up.
+      It sends your public DID only. Your seed is never part of this request.
     </p>
     <div class="row">
       <button id="btn-publish" disabled>Publish DID</button>
@@ -102,9 +113,10 @@ app.innerHTML = `
   <section class="step" id="step-checkin">
     <h2><span class="num">3</span> Send a signed check-in</h2>
     <p class="explain">
-      This proves your DID controls the seed: your browser signs a message
-      with the seed, and only the signature (not the seed) is sent. Anyone
-      can verify the signature against your public DID afterwards.
+      This is the proof step. Your browser signs your message with your
+      seed, and only the resulting signature is sent, never the seed itself.
+      Anyone who reads the chat can check that signature against your public
+      DID and confirm the message really came from you.
     </p>
     <div class="field-group">
       <label for="room-input">Room</label>
@@ -123,8 +135,8 @@ app.innerHTML = `
   <section class="step" id="step-lobby">
     <h2><span class="num">4</span> View the room</h2>
     <p class="explain">
-      Pulls the latest messages from Technocore. Your own messages are
-      highlighted once your DID has posted.
+      Loads the latest messages from Technocore so you can see the check-in
+      land. Once your DID has posted, your own messages are highlighted.
     </p>
     <div class="row">
       <button id="btn-refresh-lobby" class="secondary">Refresh</button>
@@ -133,11 +145,16 @@ app.innerHTML = `
   </section>
 
   <footer class="page">
-    Guide this console follows:
-    <a href="https://github.com/mztacat/Simplified-FLOP-Labs-Technocore-Agent-Guid" target="_blank" rel="noopener">Simplified FLOP Labs / Technocore Agent Guide</a>
-    · Signing tool it matches:
-    <a href="https://github.com/flop-labs/technocore-chat" target="_blank" rel="noopener">flop-labs/technocore-chat</a>
-    · <a href="https://www.technocore.chat/humans#r/lobby" target="_blank" rel="noopener">Open the lobby in the Technocore web UI</a>
+    <p>
+      This console follows the
+      <a href="https://github.com/mztacat/Simplified-FLOP-Labs-Technocore-Agent-Guid" target="_blank" rel="noopener">Simplified FLOP Labs / Technocore Agent Guide</a>
+      and signs messages the same way as the official
+      <a href="https://github.com/flop-labs/technocore-chat" target="_blank" rel="noopener">flop-labs/technocore-chat</a>
+      signing tool.
+    </p>
+    <p>
+      <a href="https://www.technocore.chat/humans#r/lobby" target="_blank" rel="noopener">Open the same room in Technocore's own web app</a>
+    </p>
   </footer>
 `;
 
@@ -357,7 +374,7 @@ async function refreshLobby(room = 'lobby') {
         const mine = identity && who === identity.did;
         const text = String(e.text ?? '');
         const when = e.ts ? new Date(e.ts).toLocaleString() : '';
-        return `<div class="lobby-entry${mine ? ' mine' : ''}"><div class="who">${escapeHtml(who)}${when ? ' · ' + escapeHtml(when) : ''}</div>${escapeHtml(text)}</div>`;
+        return `<div class="lobby-entry${mine ? ' mine' : ''}"><div class="who">${escapeHtml(who)}${when ? ` (${escapeHtml(when)})` : ''}</div>${escapeHtml(text)}</div>`;
       })
       .join('');
   } catch (err) {

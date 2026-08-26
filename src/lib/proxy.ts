@@ -1,7 +1,7 @@
 // technocore.chat sends no Access-Control-Allow-Origin header, so the browser
 // can't read a direct cross-origin response. /api/proxy (a Vercel function)
 // forwards the already-built, already-signed path server-side. It never sees
-// a private key — only public paths the client has already signed.
+// a private key, only public paths the client has already signed.
 export interface ProxyResult {
   ok: boolean;
   status: number;

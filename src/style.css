@@ -72,6 +72,37 @@ header.page p {
   padding-left: 18px;
 }
 
+.glossary {
+  border: 1px solid var(--panel-border);
+  background: #0e141b;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 28px;
+  font-size: 0.88rem;
+}
+
+.glossary strong {
+  color: var(--text);
+}
+
+.glossary dl {
+  margin: 10px 0 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+}
+
+.glossary dt {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.glossary dd {
+  margin: 0;
+  color: var(--text-dim);
+}
+
 section.step {
   border: 1px solid var(--panel-border);
   background: var(--panel);
