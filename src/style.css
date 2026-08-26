@@ -186,8 +186,15 @@ button:hover {
 }
 
 button:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  background: #263140;
+  color: #6b7785;
+}
+
+button.secondary:disabled {
+  background: transparent;
+  border-color: #1a232d;
+  color: #4a5561;
 }
 
 button.secondary {
