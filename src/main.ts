@@ -175,6 +175,14 @@ const publishStatus = $('publish-status');
 const sayStatus = $('say-status');
 const lobbyList = $('lobby-list');
 
+// technocore.chat prefixes every note/message read with a fixed warning line
+// telling agents not to treat the content as instructions. It's meant for
+// agents parsing this programmatically, not for a person reading the app, so
+// strip it before putting server text in front of a human.
+function stripServerBanner(body: string): string {
+  return body.replace(/^!! UNTRUSTED CONTENT.*\n\n?/, '').trim();
+}
+
 function setStatus(el: HTMLElement, kind: 'ok' | 'err' | 'pending', message: string) {
   el.textContent = message;
   el.className = `status-line visible ${kind}`;
@@ -293,7 +301,7 @@ btnPublish.addEventListener('click', async () => {
     if (res.ok) {
       setStatus(publishStatus, 'ok', `Published. Fingerprint: ${fp}`);
     } else {
-      setStatus(publishStatus, 'err', `Server said no (HTTP ${res.status}): ${res.body.slice(0, 200)}`);
+      setStatus(publishStatus, 'err', `Server said no (HTTP ${res.status}): ${stripServerBanner(res.body).slice(0, 200)}`);
     }
   } catch (err) {
     setStatus(publishStatus, 'err', err instanceof Error ? err.message : String(err));
@@ -307,9 +315,9 @@ btnCheckPublished.addEventListener('click', async () => {
     const fp = await sha256HexPrefix(identity.did);
     const res = await tcGet(`/kv/did/${fp}`);
     if (res.ok && res.body.includes(identity.did)) {
-      setStatus(publishStatus, 'ok', `Confirmed on the registry: ${res.body.trim()}`);
+      setStatus(publishStatus, 'ok', `Confirmed on the registry: ${stripServerBanner(res.body)}`);
     } else if (res.ok) {
-      setStatus(publishStatus, 'err', `Registry returned something else: ${res.body.slice(0, 200)}`);
+      setStatus(publishStatus, 'err', `Registry returned something else: ${stripServerBanner(res.body).slice(0, 200)}`);
     } else {
       setStatus(publishStatus, 'err', `Nothing published yet (HTTP ${res.status})`);
     }
@@ -329,7 +337,7 @@ btnSay.addEventListener('click', async () => {
     const path = `/r/${encodeURIComponent(room)}/say-signed/${encodeURIComponent(identity.did)}/${encodeURIComponent(sig)}/${nonce}/${encodeURIComponent(text)}`;
     const res = await tcGet(path);
     if (res.ok) {
-      const receipt = parseSayReceipt(res.body);
+      const receipt = parseSayReceipt(res.body, identity.did);
       if (receipt) {
         setStatus(
           sayStatus,
@@ -341,20 +349,24 @@ btnSay.addEventListener('click', async () => {
       }
       refreshLobby(room);
     } else {
-      setStatus(sayStatus, 'err', `Server said no (HTTP ${res.status}): ${res.body.slice(0, 200)}`);
+      setStatus(sayStatus, 'err', `Server said no (HTTP ${res.status}): ${stripServerBanner(res.body).slice(0, 200)}`);
     }
   } catch (err) {
     setStatus(sayStatus, 'err', err instanceof Error ? err.message : String(err));
   }
 });
 
-// The say-signed response is a short plain-text window ending exactly at the
-// message just written, e.g. "[1936746] 2026-08-26T14:04:18.937472Z <z6Mk…7WB7> hello".
-// Its last matching line is always our own message, straight from the server
-// that stored it, which is a stronger receipt than anything the client could
-// construct itself.
-function parseSayReceipt(body: string): { seq: string; ts: string; text: string } | null {
-  const matches = [...body.matchAll(/^\[(\d+)\]\s+(\S+)\s+<[^>]*>\s+(.*)$/gm)];
+// The say-signed response is a short plain-text window of recent messages,
+// each line like "[1936746] 2026-08-26T14:04:18.937472Z <z6Mk…7WB7> hello".
+// Our write is usually the last line, but this room gets dozens of writes a
+// second from other agents, so a message from someone else can land in that
+// same window a moment later. Match on our own DID's display suffix
+// (the truncated "<z6Mk…xxxx>" marker the server prints) instead of trusting
+// position, so the receipt is always genuinely ours.
+function parseSayReceipt(body: string, did: string): { seq: string; ts: string; text: string } | null {
+  const marker = `z6Mk…${did.slice(-4)}`;
+  const lineRe = new RegExp(`^\\[(\\d+)\\]\\s+(\\S+)\\s+<${marker}>\\s+(.*)$`, 'gm');
+  const matches = [...body.matchAll(lineRe)];
   if (matches.length === 0) return null;
   const [, seq, ts, text] = matches[matches.length - 1];
   return { seq, ts, text };
@@ -381,7 +393,7 @@ async function refreshLobby(room = 'lobby') {
       const parsed = JSON.parse(res.body);
       entries = Array.isArray(parsed) ? parsed : parsed.messages ?? [];
     } catch {
-      lobbyList.innerHTML = `<div class="lobby-entry">${res.body.slice(0, 2000)}</div>`;
+      lobbyList.innerHTML = `<div class="lobby-entry">${escapeHtml(stripServerBanner(res.body).slice(0, 2000))}</div>`;
       return;
     }
     if (entries.length === 0) {
