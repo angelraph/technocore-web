@@ -1,23 +1,25 @@
 :root {
   color-scheme: dark;
-  --bg: #0b0f14;
-  --panel: #121821;
-  --panel-border: #1f2937;
-  --text: #e6edf3;
-  --text-dim: #8b98a5;
-  --accent: #5eead4;
-  --accent-dim: #2dd4bf33;
-  --warn-bg: #2a1a12;
-  --warn-border: #7c4a1e;
-  --warn-text: #f2b970;
-  --danger-bg: #2a1214;
-  --danger-border: #7c2530;
-  --danger-text: #f28b8b;
-  --ok-bg: #10241d;
-  --ok-border: #1f6b4f;
-  --ok-text: #7ee2b8;
-  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --bg: #0a1128;
+  --panel: #111a3a;
+  --panel-border: #232f5c;
+  --field-bg: #0d1530;
+  --text: #f5f7fa;
+  --text-dim: #8791b3;
+  --accent: #00b4d8;
+  --accent-ink: #04212b;
+  --accent-dim: #00b4d826;
+  --warn-bg: #2a2112;
+  --warn-border: #7c5a1e;
+  --warn-text: #f2c470;
+  --danger-bg: #2a1420;
+  --danger-border: #7c2550;
+  --danger-text: #f28bbb;
+  --ok-bg: #0f2430;
+  --ok-border: #1f6b7c;
+  --ok-text: #7ee2f2;
+  --font: "Space Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --mono: var(--font);
 }
 
 * {
@@ -28,8 +30,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--sans);
-  line-height: 1.5;
+  font-family: var(--font);
+  line-height: 1.6;
 }
 
 #app {
@@ -40,17 +42,37 @@ body {
 
 header.page {
   margin-bottom: 28px;
+  text-align: center;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  margin-bottom: 14px;
+}
+
+.brand .flop {
+  color: var(--accent);
+}
+
+.brand .rest {
+  color: var(--text);
 }
 
 header.page h1 {
   font-size: 1.5rem;
-  margin: 0 0 6px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0 0 10px;
 }
 
 header.page p {
   color: var(--text-dim);
-  margin: 0;
-  font-size: 0.95rem;
+  margin: 0 auto;
+  font-size: 0.92rem;
+  max-width: 60ch;
+  text-align: left;
 }
 
 .banner {
@@ -64,7 +86,7 @@ header.page p {
 }
 
 .banner strong {
-  color: #ffd28a;
+  color: #ffd88a;
 }
 
 .banner ul {
@@ -74,7 +96,7 @@ header.page p {
 
 .glossary {
   border: 1px solid var(--panel-border);
-  background: #0e141b;
+  background: var(--field-bg);
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 28px;
@@ -93,9 +115,8 @@ header.page p {
 }
 
 .glossary dt {
-  font-family: var(--mono);
+  font-weight: 700;
   color: var(--accent);
-  font-weight: 600;
 }
 
 .glossary dd {
@@ -113,6 +134,7 @@ section.step {
 
 section.step h2 {
   font-size: 1.05rem;
+  font-weight: 700;
   margin: 0 0 4px;
   display: flex;
   align-items: center;
@@ -129,7 +151,6 @@ section.step h2 .num {
   background: var(--accent-dim);
   color: var(--accent);
   font-size: 0.8rem;
-  font-family: var(--mono);
 }
 
 section.step .explain {
@@ -156,13 +177,19 @@ label {
 input[type="text"],
 textarea {
   width: 100%;
-  background: #0e141b;
+  background: var(--field-bg);
   border: 1px solid var(--panel-border);
   color: var(--text);
   border-radius: 6px;
   padding: 9px 10px;
-  font-family: var(--mono);
+  font-family: var(--font);
   font-size: 0.88rem;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 textarea {
@@ -172,36 +199,37 @@ textarea {
 
 button {
   background: var(--accent);
-  color: #06231c;
+  color: var(--accent-ink);
   border: none;
   border-radius: 6px;
   padding: 9px 16px;
+  font-family: var(--font);
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
 button:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
 }
 
 button:disabled {
   cursor: not-allowed;
-  background: #263140;
-  color: #6b7785;
+  background: #26325c;
+  color: #7681a3;
 }
 
 button.secondary:disabled {
   background: transparent;
-  border-color: #1a232d;
-  color: #4a5561;
+  border-color: #1c2748;
+  color: #505d85;
 }
 
 button.secondary {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--panel-border);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 button.secondary:hover {
@@ -210,7 +238,7 @@ button.secondary:hover {
 
 button.danger {
   background: var(--danger-text);
-  color: #2a0d0d;
+  color: #2a0d1c;
 }
 
 .field-group {
@@ -218,9 +246,9 @@ button.danger {
 }
 
 .mono-box {
-  font-family: var(--mono);
+  font-family: var(--font);
   font-size: 0.85rem;
-  background: #0e141b;
+  background: var(--field-bg);
   border: 1px solid var(--panel-border);
   border-radius: 6px;
   padding: 10px 12px;
@@ -280,9 +308,9 @@ button.danger {
 }
 
 .status-line.pending {
-  background: #14202b;
-  border: 1px solid #274357;
-  color: #8ec5e8;
+  background: #101d38;
+  border: 1px solid #27407c;
+  color: #8ec9f2;
 }
 
 .checkbox-row {
@@ -299,7 +327,7 @@ button.danger {
 }
 
 .lobby-list {
-  font-family: var(--mono);
+  font-family: var(--font);
   font-size: 0.82rem;
   max-height: 320px;
   overflow: auto;

@@ -18,6 +18,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!;
 
 app.innerHTML = `
   <header class="page">
+    <div class="brand"><span class="flop">FLOP</span> <span class="rest">LABS / TECHNOCORE</span></div>
     <h1>Technocore Agent Console</h1>
     <p>
       This page creates a Technocore agent identity and sends a signed
