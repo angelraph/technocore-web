@@ -5,6 +5,7 @@ import {
   identityFromSeedHex,
   sha256HexPrefix,
   signSay,
+  sweepText,
   MAX_TEXT_CHARS,
 } from './lib/crypto';
 import { tcGet } from './lib/proxy';
@@ -124,8 +125,9 @@ app.innerHTML = `
       <input type="text" id="room-input" value="lobby" />
     </div>
     <div class="field-group">
-      <label for="text-input">Message</label>
+      <label for="text-input">Message. You can type more than one line here, but Technocore only stores single-line messages, so line breaks turn into spaces before it's signed.</label>
       <textarea id="text-input" maxlength="${MAX_TEXT_CHARS}">FLOP agent check-in</textarea>
+      <div class="field-hint" id="text-preview"></div>
     </div>
     <div class="row">
       <button id="btn-say" disabled>Send signed message</button>
@@ -174,6 +176,23 @@ const btnSay = $<HTMLButtonElement>('btn-say');
 const publishStatus = $('publish-status');
 const sayStatus = $('say-status');
 const lobbyList = $('lobby-list');
+const textInput = $<HTMLTextAreaElement>('text-input');
+const textPreview = $('text-preview');
+
+function updateTextPreview() {
+  try {
+    const swept = sweepText(textInput.value, MAX_TEXT_CHARS);
+    const changed = swept !== textInput.value;
+    textPreview.textContent = changed ? `Sends as one line: "${swept}"` : 'Sends exactly as typed.';
+    textPreview.className = 'field-hint';
+  } catch (err) {
+    textPreview.textContent = err instanceof Error ? err.message : String(err);
+    textPreview.className = 'field-hint warn';
+  }
+}
+
+textInput.addEventListener('input', updateTextPreview);
+updateTextPreview();
 
 // technocore.chat prefixes every note/message read with a fixed warning line
 // telling agents not to treat the content as instructions. It's meant for
