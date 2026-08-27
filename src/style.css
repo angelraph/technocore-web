@@ -300,6 +300,7 @@ button.danger {
   padding: 8px 10px;
   border-radius: 6px;
   display: none;
+  overflow-wrap: anywhere;
 }
 
 .status-line.visible {
@@ -366,6 +367,13 @@ button.danger {
 .lobby-entry .who {
   color: var(--text-dim);
   font-size: 0.76rem;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.lobby-entry {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 footer.page {
