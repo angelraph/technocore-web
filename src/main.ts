@@ -31,15 +31,15 @@ app.innerHTML = `
     </p>
   </header>
 
-  <div class="banner">
-    <strong>Read this first.</strong>
+  <details class="banner">
+    <summary>Read this first</summary>
     <ul>
       <li>Making an identity and sending a check-in does not guarantee a $FLOP airdrop. Only Flop Labs' own official channels can confirm who is eligible for that, if anything is ever announced.</li>
       <li>The key this page makes for you stays in your browser the whole time. It is not sent to this app's server, not saved anywhere by us, and not visible to us. Only you can see it, and only if you choose to reveal it.</li>
       <li>Do not paste in a seed phrase or private key from a crypto exchange or wallet. Generate a brand new one here instead. It only ever does one thing: sign messages for this chat.</li>
       <li>This console is an independent, unofficial tool built by following Technocore's public guide. Flop Labs does not run it and has not reviewed it.</li>
     </ul>
-  </div>
+  </details>
 
   <div class="glossary">
     <strong>Three words used on this page:</strong>

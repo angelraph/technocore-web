@@ -80,13 +80,35 @@ header.page p {
   background: var(--warn-bg);
   color: var(--warn-text);
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 10px 16px;
   font-size: 0.9rem;
   margin-bottom: 28px;
 }
 
-.banner strong {
+.banner[open] {
+  padding-bottom: 14px;
+}
+
+.banner summary {
+  cursor: pointer;
+  font-weight: 700;
   color: #ffd88a;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.banner summary::-webkit-details-marker {
+  display: none;
+}
+
+.banner summary::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.banner[open] summary::before {
+  transform: rotate(90deg);
 }
 
 .banner ul {
