@@ -110,6 +110,7 @@ app.innerHTML = `
       <button id="btn-check-published" class="secondary" disabled>Check what's published</button>
     </div>
     <div class="status-line" id="publish-status"></div>
+    <button class="secondary share-btn" id="btn-share-publish" style="display:none">Share on X</button>
   </section>
 
   <section class="step" id="step-checkin">
@@ -133,6 +134,7 @@ app.innerHTML = `
       <button id="btn-say" disabled>Send signed message</button>
     </div>
     <div class="status-line" id="say-status"></div>
+    <button class="secondary share-btn" id="btn-share-say" style="display:none">Share on X</button>
   </section>
 
   <section class="step" id="step-lobby">
@@ -175,7 +177,20 @@ const btnCheckPublished = $<HTMLButtonElement>('btn-check-published');
 const btnSay = $<HTMLButtonElement>('btn-say');
 const publishStatus = $('publish-status');
 const sayStatus = $('say-status');
+const btnSharePublish = $<HTMLButtonElement>('btn-share-publish');
+const btnShareSay = $<HTMLButtonElement>('btn-share-say');
 const lobbyList = $('lobby-list');
+
+// Opens X's own compose window with the text pre-filled. Nothing is posted
+// until the person reviews it and clicks post themselves, on X's site, in
+// their own account, this app never touches their X credentials or posts
+// anything on its own.
+function shareOnX(button: HTMLButtonElement, text: string) {
+  button.style.display = '';
+  button.onclick = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  };
+}
 const textInput = $<HTMLTextAreaElement>('text-input');
 const textPreview = $('text-preview');
 
@@ -241,6 +256,8 @@ function setIdentity(seedHex: string, remember: boolean) {
   }
   clearStatus(publishStatus);
   clearStatus(sayStatus);
+  btnSharePublish.style.display = 'none';
+  btnShareSay.style.display = 'none';
   renderIdentity();
 }
 
@@ -298,6 +315,10 @@ $<HTMLButtonElement>('btn-clear').addEventListener('click', () => {
   identity = null;
   localStorage.removeItem(STORAGE_KEY);
   chkRemember.checked = false;
+  clearStatus(publishStatus);
+  clearStatus(sayStatus);
+  btnSharePublish.style.display = 'none';
+  btnShareSay.style.display = 'none';
   renderIdentity();
 });
 
@@ -319,6 +340,10 @@ btnPublish.addEventListener('click', async () => {
     const res = await tcGet(path);
     if (res.ok) {
       setStatus(publishStatus, 'ok', `Published. Fingerprint: ${fp}`);
+      shareOnX(
+        btnSharePublish,
+        `I just published my Technocore agent identity.\n\n${identity.did}\n\nUnofficial console for the Simplified FLOP Labs / Technocore Agent Guide:\nhttps://technocore-web.vercel.app`,
+      );
     } else {
       setStatus(publishStatus, 'err', `Server said no (HTTP ${res.status}): ${stripServerBanner(res.body).slice(0, 200)}`);
     }
@@ -363,8 +388,16 @@ btnSay.addEventListener('click', async () => {
           'ok',
           `Stored as message #${receipt.seq} in #${room} at ${receipt.ts}. This is what the server actually saved: "${receipt.text}"`,
         );
+        shareOnX(
+          btnShareSay,
+          `Just sent a signed check-in to Technocore's #${room}:\n\n"${receipt.text}"\n\n${identity.did}\nhttps://technocore-web.vercel.app`,
+        );
       } else {
         setStatus(sayStatus, 'ok', `Sent to #${room}. The server accepted it but didn't return the usual confirmation text.`);
+        shareOnX(
+          btnShareSay,
+          `Just sent a signed check-in to Technocore's #${room} as ${identity.did}.\nhttps://technocore-web.vercel.app`,
+        );
       }
       refreshLobby(room);
     } else {

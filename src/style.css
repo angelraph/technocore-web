@@ -318,6 +318,10 @@ button.danger {
   color: var(--danger-text);
 }
 
+.share-btn {
+  margin-top: 10px;
+}
+
 .status-line.pending {
   background: #101d38;
   border: 1px solid #27407c;
